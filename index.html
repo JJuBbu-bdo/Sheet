@@ -5,6 +5,82 @@
 <meta charset="utf-8"/>
 <title>킹갓구조대 파티일정 현황</title>
 <style>
+
+/* 개선된 화이트 모드 스타일 */
+body {
+  background: #ffffff !important;
+  color: #111827 !important;
+}
+
+.calendar {
+  background: #ffffff !important;
+}
+
+.day {
+  background: #f9fafb !important;
+  color: #111827 !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+.day:hover {
+  background: #e2e8f0 !important;
+}
+
+.header {
+  background: #e2e8f0 !important;
+  color: #475569 !important;
+  font-weight: 600 !important;
+}
+
+.filter-button {
+  background: #ffffff !important;
+  color: #334155 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+.filter-button.filter-active {
+  background: #4f46e5 !important;
+  color: white !important;
+}
+
+.popover {
+  background: #ffffff !important;
+  color: #111827 !important;
+}
+
+.calendar .header:nth-child(7n+1),
+.calendar .day:nth-child(7n+1) strong {
+  color: #dc2626 !important; /* 일요일 - 붉은색 */
+}
+
+.calendar .header:nth-child(7n),
+.calendar .day:nth-child(7n) strong {
+  color: #2563eb !important; /* 토요일 - 파란색 */
+}
+
+/* 필터와 날짜 셀렉터 한 줄 정렬 */
+.filter-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* 날짜 선택 부분을 오른쪽으로 밀기 */
+.calendar-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+  align-items: center;
+}
+
+.calendar-controls select,
+.calendar-controls button {
+  margin-left: 0;
+}
+
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
     body {
@@ -195,11 +271,7 @@
       z-index: 998;
     }
     
-@media (prefers-color-scheme: dark) {
-  body {
-    background: #1e1e1e;
-    color: #e5e7eb;
-  }
+
   .day {
     background: #2a2a2a;
     color: #e5e7eb;
@@ -242,10 +314,7 @@
   z-index: 2;
   transition: background 0.3s ease;
 }
-@media (prefers-color-scheme: dark) {
-  .header {
-    background: #374151;
-  }
+
 }
 
 .calendar-controls {
@@ -259,10 +328,7 @@
   padding: 0.5rem;
   border-radius: 0.5rem;
 }
-@media (prefers-color-scheme: dark) {
-  .calendar-controls {
-    background: rgba(31, 41, 55, 0.8);
-  }
+
 }
 
 .filter-wrapper {
