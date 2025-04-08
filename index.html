@@ -3,7 +3,6 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8"/>
-    <meta name="color-scheme" content="light">
 <title>킹갓구조대 파티일정 현황</title>
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
@@ -84,7 +83,11 @@
 }
 
 /* ✅ 모바일 화면 (700px 이하)에서는 2칸씩 표시 */
-
+@media (max-width: 700px) {
+  .calendar {
+    grid-template-columns: repeat(2, minmax(160px, 1fr)); /* 모바일에선 2열 + 더 넓은 칸 */
+  }
+}
 
     .header {
       text-align: center;
@@ -192,7 +195,11 @@
       z-index: 998;
     }
     
-
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #1e1e1e;
+    color: #e5e7eb;
+  }
   .day {
     background: #2a2a2a;
     color: #e5e7eb;
@@ -235,7 +242,11 @@
   z-index: 2;
   transition: background 0.3s ease;
 }
-
+@media (prefers-color-scheme: dark) {
+  .header {
+    background: #374151;
+  }
+}
 
 .calendar-controls {
   flex-direction: column;
@@ -248,7 +259,11 @@
   padding: 0.5rem;
   border-radius: 0.5rem;
 }
-
+@media (prefers-color-scheme: dark) {
+  .calendar-controls {
+    background: rgba(31, 41, 55, 0.8);
+  }
+}
 
 .filter-wrapper {
   display: flex;
