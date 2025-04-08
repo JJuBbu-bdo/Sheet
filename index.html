@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<title>킹갓구조대 파티일정 현황</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #fefefe;
+      color: #333;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .title {
+      font-size: 2rem;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .legend {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+    }
+
+    .legend span {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: inline-block;
+}
+
+    .level-일반 { background: #cffafe; color: #0e7490; }
+    .level-도전 { background: #fecaca; color: #b91c1c; }
+    .level-엘비아오르 { background: #e9d5ff; color: #6b21a8; }
+
+    .calendar-controls,
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    select, .filter-button, #resetBtn {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: white;
+      font-size: 0.85rem;
+      color: #374151;
+      cursor: pointer;
+    }
+
+    .filter-button.filter-active {
+      background: #4f46e5;
+      color: white;
+      border-color: #4f46e5;
+      font-weight: bold;
+    }
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(140px, 1fr)); /* ✅ 넓은 화면: 최소 140px 보장 */
+  gap: 12px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ✅ 모바일 화면 (700px 이하)에서는 2칸씩 표시 */
+@media (max-width: 700px) {
+  .calendar {
+    grid-template-columns: repeat(2, minmax(160px, 1fr)); /* 모바일에선 2열 + 더 넓은 칸 */
+  }
+}
+
+    .header {
+      text-align: center;
+      font-weight: 600;
+      color: #6b7280;
+      font-size: 0.85rem;
+      padding-bottom: 0.5rem;
+    }
+
+    .day {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      padding: 1.5rem 0.75rem 0.75rem;
+      min-height: 120px;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .day:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .day strong {
+      position: absolute;
+      top: 6px;
+      right: 12px;
+      background: #f3f4f6;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #4b5563;
+    }
+
+    .today {
+      border: 2px solid #10b981;
+      box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
+    }
+
+    .event {
+      margin-top: 0.4rem;
+      font-size: 0.7rem;
+    }
+
+    .event span {
+      display: inline-block;
+      padding: 1px 4px;
+      border-radius: 6px;
+      margin: 1px 1px 0 0;
+      font-size: 0.7rem;
+      line-height: 1.1;
+    }
+
+    .more-popover {
+      font-size: 0.65rem;
+      margin-top: 0.25rem;
+      color: #6b7280;
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+    }
+
+    .popover {
+      display: none;
+      position: absolute;
+      bottom: 110%;
+      left: 0;
+      background: white;
+      padding: 6px 8px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      z-index: 10;
+    }
+
+    .more-popover:hover .popover {
+      display: block;
+    }
+
+    #modal, #overlay {
+      display: none;
+      position: fixed;
+      z-index: 999;
+    }
+
+    #modal {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 1rem;
+      border-radius: 16px;
+      max-width: 340px;
+      width: 90%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    #overlay {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.3);
+      z-index: 998;
+    }
+    
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #1e1e1e;
+    color: #e5e7eb;
+  }
+  .day {
+    background: #2a2a2a;
+    color: #e5e7eb;
+  }
+  .today {
+    border-color: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34,197,94,0.4);
+  }
+  .header {
+    background: #374151;
+    color: #d1d5db;
+  }
+  .level-일반 { background: #155e75; color: #a5f3fc; }
+  .level-도전 { background: #7f1d1d; color: #fecaca; }
+  .level-엘비아오르 { background: #581c87; color: #e9d5ff; }
+  .popover {
+    background: #1f2937;
+    color: #f3f4f6;
+  }
+  .write-button {
+    background: #374151;
+    color: #f3f4f6;
+    border-color: #4b5563;
+  }
+  .filter-button {
+    background: #1f2937;
+    color: #d1d5db;
+    border-color: #4b5563;
+  }
+  .filter-button.filter-active {
+    background: #4f46e5;
+    color: white;
+  }
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  background: #f1f5f9;
+  z-index: 2;
+  transition: background 0.3s ease;
+}
+@media (prefers-color-scheme: dark) {
+  .header {
+    background: #374151;
+  }
+}
+
+.calendar-controls {
+  flex-direction: column;
+  align-items: flex-end;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 10;
+  background: rgba(255,255,255,0.8);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+@media (prefers-color-scheme: dark) {
+  .calendar-controls {
+    background: rgba(31, 41, 55, 0.8);
+  }
+}
+
+.filter-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.calendar-controls {
+  flex-direction: row;
+  align-items: center;
+  position: static;
+  background: transparent;
+  padding: 0;
+}
+.calendar-controls select,
+.calendar-controls button {
+  margin-left: 4px;
+}
+
+.calendar .header:nth-child(7n+1),
+.calendar .day:nth-child(7n+1) strong {
+  color: #dc2626; /* Sunday - red */
+}
+.calendar .header:nth-child(7n),
+.calendar .day:nth-child(7n) strong {
+  color: #2563eb; /* Saturday - blue */
+}
+
+.legend {
+  margin-top: -0.25rem;
+  margin-bottom: 1rem;
+}
+
+.write-button:hover {
+  background-color: #4338ca;
+  color: white;
+}
+
+.popover span {
+  white-space: nowrap;
+  display: block;
+  width: max-content;
+  min-width: 80px;
+}
+
+.popover span {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.popover span {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: inherit;
+}
+.popover .name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+.popover .time {
+  flex-shrink: 0;
+  margin-left: 6px;
+}
+
+.header {
+  background: #f1f5f9;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);  /* 요일 부분에 그림자 효과 추가 */
+}
+
+.day:hover {
+  background-color: #d1d5db;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15); /* hover 시 색상 변화 및 그림자 */
+}
+
+.day:active {
+  transform: scale(0.98); /* 클릭 시 미세 애니메이션 */
+}
+</style>
+</head>
+<body>
+<div class="top-bar">
+<div>
+<div class="title">
+        📅 Google Sheet 달력 보기
+      </div>
+</div>
+<a class="write-button" href="https://docs.google.com/spreadsheets/d/17bsu3R-nT8j2gv8Chr8NMqF12nqTNVdw62__h1ljlUI/edit" style="background-color: #4f46e5; color: white; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 500; font-size: 0.9rem; text-decoration: none; display: inline-block;" target="_blank"><span style="font-weight: normal;">✏️ </span><span style="font-weight: 600;">일정 작성</span></a>
+</div>
+<div class="legend">
+<span class="level-일반">일반</span>
+<span class="level-도전">도전</span>
+<span class="level-엘비아오르">엘비아오르</span>
+</div><div class="filter-wrapper"><div class="filter-bar">
+<button class="filter-button filter-active" data-filter="전체" onclick="setFilter('전체')">전체</button>
+<button class="filter-button" data-filter="일반" onclick="setFilter('일반')">일반</button>
+<button class="filter-button" data-filter="도전" onclick="setFilter('도전')">도전</button>
+<button class="filter-button" data-filter="엘비아오르" onclick="setFilter('엘비아오르')">엘비아오르</button>
+</div><div class="calendar-controls">
+<select id="year"></select>
+<select id="month"></select>
+<button id="resetBtn">오늘</button>
+</div></div>
+<div class="calendar" id="calendar" style=" position: relative;"></div>
+<div id="overlay"></div>
+<div id="modal">
+<h3>상세 일정</h3>
+<div id="modal-content"></div>
+</div>
+<!-- 생략된 head와 style 부분은 기존과 동일합니다 -->
+
+<script>
+  const SHEET_ID = "17bsu3R-nT8j2gv8Chr8NMqF12nqTNVdw62__h1ljlUI";
+  const API_KEY = "AIzaSyARIhUSeTkfMsPOHJlQ0B3XlNzi8KyYe4k";
+  const calendarEl = document.getElementById("calendar");
+  const yearEl = document.getElementById("year");
+  const monthEl = document.getElementById("month");
+  const modal = document.getElementById("modal");
+  const overlay = document.getElementById("overlay");
+  const modalContent = document.getElementById("modal-content");
+  let currentFilter = "전체";
+
+  for (let y = 2024; y <= 2026; y++) {
+    const opt = document.createElement("option");
+    opt.value = y;
+    opt.text = y + "년";
+    yearEl.appendChild(opt);
+  }
+
+  for (let m = 1; m <= 12; m++) {
+    const opt = document.createElement("option");
+    opt.value = m;
+    opt.text = m + "월";
+    monthEl.appendChild(opt);
+  }
+
+  const today = new Date();
+  yearEl.value = today.getFullYear();
+  monthEl.value = today.getMonth() + 1;
+
+  document.getElementById("resetBtn").onclick = () => {
+    yearEl.value = today.getFullYear();
+    monthEl.value = today.getMonth() + 1;
+    loadCalendar();
+  };
+
+  function setFilter(f) {
+    document.querySelectorAll('.filter-button').forEach(btn => {
+      btn.classList.toggle("filter-active", btn.dataset.filter === f);
+    });
+    currentFilter = f;
+    loadCalendar();
+  }
+
+  function openModal(dateStr, matched) {
+    modalContent.innerHTML = matched.map(([name, level, date, time, crown]) => {
+      const displayName = crown === "TRUE" ? `👑 ${name}` : name;
+      return `<div class="event"><span class="level-${level.trim()}">${displayName} - ${time}</span></div>`;
+    }).join('');
+    modal.querySelector("h3").textContent = `${dateStr} 일정`;
+    modal.style.display = "block";
+    overlay.style.display = "block";
+  }
+
+  overlay.onclick = () => {
+    modal.style.display = "none";
+    overlay.style.display = "none";
+  };
+
+  async function loadCalendar() {
+    const year = parseInt(yearEl.value);
+    const month = parseInt(monthEl.value);
+
+    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/입력!A2:E100?key=${API_KEY}`);
+    const json = await res.json();
+    const values = json.values || [];
+
+    calendarEl.innerHTML = "";
+
+    const startDate = new Date(year, month - 1, 1);
+    const startDay = startDate.getDay();
+    const lastDate = new Date(year, month, 0).getDate();
+    const todayStr = `${today.getFullYear()}-${(today.getMonth()+1).toString().padStart(2,'0')}-${today.getDate().toString().padStart(2,'0')}`;
+
+    const headers = ['일', '월', '화', '수', '목', '금', '토'];
+    headers.forEach(d => {
+      const h = document.createElement("div");
+      h.className = "header";
+      h.textContent = d;
+      calendarEl.appendChild(h);
+    });
+
+    for (let i = 0; i < startDay; i++) {
+      calendarEl.appendChild(document.createElement("div"));
+    }
+
+    for (let day = 1; day <= lastDate; day++) {
+      const div = document.createElement("div");
+      div.className = "day";
+      const dateStr = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+      if (dateStr === todayStr) div.classList.add("today");
+      div.innerHTML = `<strong>${day}</strong>`;
+
+      let matched = values.filter(([n, l, d, t, p]) => {
+        if (!n || !l || !d || !t) return false;
+        if (currentFilter !== "전체" && l.trim() !== currentFilter) return false;
+        const parsed = new Date(d);
+        const ymd = `${parsed.getFullYear()}-${(parsed.getMonth() + 1).toString().padStart(2, '0')}-${parsed.getDate().toString().padStart(2, '0')}`;
+        return ymd === dateStr;
+      });
+
+      // 정렬: 1. 파장 TRUE 우선, 2. 시간순
+      matched.sort((a, b) => {
+        const crownA = a[4] === "TRUE" ? 1 : 0;
+        const crownB = b[4] === "TRUE" ? 1 : 0;
+        if (crownA !== crownB) return crownB - crownA;
+        return a[3].localeCompare(b[3]);
+      });
+
+      const visible = matched.slice(0, 5);
+      const hidden = matched.slice(5);
+
+      visible.forEach(([n, l, d, t, p]) => {
+        const e = document.createElement("div");
+        e.className = `event`;
+        const displayName = p === "TRUE" ? `👑 ${n}` : n;
+        e.innerHTML = `<span class="level-${l.trim()}">${displayName} - ${t}</span>`;
+        div.appendChild(e);
+      });
+
+      if (hidden.length > 0) {
+        const more = document.createElement("div");
+        more.className = "event";
+        const hiddenNames = hidden.map(([n, l, d, t, p]) => {
+          const displayName = p === "TRUE" ? `👑 ${n}` : n;
+          return `<span class="level-${l.trim()}">${displayName} - ${t}</span>`;
+        }).join("<br>");
+        more.innerHTML = `
+          <span class="more-popover">+${hidden.length}명
+            <div class="popover">${hiddenNames}</div>
+          </span>`;
+        div.appendChild(more);
+      }
+
+      div.onclick = () => openModal(dateStr, matched);
+      calendarEl.appendChild(div);
+    }
+  }
+
+  yearEl.addEventListener("change", loadCalendar);
+  monthEl.addEventListener("change", loadCalendar);
+  loadCalendar();
+</script>
+
+</body>
+</html>
