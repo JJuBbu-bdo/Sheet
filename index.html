@@ -6,6 +6,82 @@
 <title>킹갓구조대 파티일정 현황</title>
 <style>
 
+.calendar .header {
+  background-color: #1f2937 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+/* 요일 강조 색상 (토, 일) 유지 */
+.calendar .header:nth-child(7n+1) {
+  color: #dc2626 !important; /* 일요일 */
+}
+.calendar .header:nth-child(7n) {
+  color: #2563eb !important; /* 토요일 */
+}
+
+
+.header {
+  background: #1f2937 !important;  /* 어두운 회색 (거의 검정) */
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+/* 일요일 빨강, 토요일 파랑 유지 */
+.calendar .header:nth-child(7n+1) {
+  color: #dc2626 !important; /* 일요일 */
+}
+.calendar .header:nth-child(7n) {
+  color: #2563eb !important; /* 토요일 */
+}
+
+
+.header {
+  background: #cbd5e1 !important;
+  color: #475569 !important;
+  font-weight: 600 !important;
+}
+
+/* 요일 강조 색상 (기존 유지) */
+.calendar .header:nth-child(7n+1) {
+  color: #dc2626 !important; /* 일요일 - 빨강 */
+}
+.calendar .header:nth-child(7n) {
+  color: #2563eb !important; /* 토요일 - 파랑 */
+}
+
+
+.header {
+  background: #e2e8f0 !important;
+  color: #475569 !important;
+  font-weight: 600 !important;
+}
+
+/* 요일 강조 색상 (기존 유지) */
+.calendar .header:nth-child(7n+1) {
+  color: #dc2626 !important; /* 일요일 - 빨강 */
+}
+
+.calendar .header:nth-child(7n) {
+  color: #2563eb !important; /* 토요일 - 파랑 */
+}
+
+
+/* 팝오버 내부 색상 보정 */
+.popover .level-일반 {
+  background: #cffafe !important;
+  color: #0e7490 !important;
+}
+.popover .level-도전 {
+  background: #fecaca !important;
+  color: #b91c1c !important;
+}
+.popover .level-엘비아오르 {
+  background: #e9d5ff !important;
+  color: #6b21a8 !important;
+}
+
+
 /* 개선된 화이트 모드 스타일 */
 body {
   background: #ffffff !important;
